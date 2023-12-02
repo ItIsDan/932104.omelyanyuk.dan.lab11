@@ -1,7 +1,10 @@
+using dotnet.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<IGetData, GetDataService>();
 
 var app = builder.Build();
 

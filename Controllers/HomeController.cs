@@ -1,40 +1,16 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using dotnet.Models;
-using Lab1.Models;
-using Lab1.ViewModels;
 
 namespace dotnet.Controllers
 {
-
     public class HomeController : Controller
     {
-        //    private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> _logger;
 
-        public LabModel Calculate()
+        public HomeController(ILogger<HomeController> logger)
         {
-            Random rnd = new Random(DateTime.Now.Millisecond);
-            (var first, var second) = (rnd.Next() % 10, rnd.Next() % 10);
-
-            int divResult;
-            try
-            {
-                divResult = first / second;
-            }
-            catch (DivideByZeroException)
-            {
-                divResult = -1;
-            }
-
-            return new LabModel
-            {
-                firstRndNum = first,
-                secondRndNum = second,
-                sumResult = first + second,
-                subResult = first - second,
-                divResult = divResult,
-                mulResult = first * second
-            };
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -42,23 +18,56 @@ namespace dotnet.Controllers
             return View();
         }
 
-        public IActionResult PassUsingViewData()
+        public IActionResult UsingModel()
         {
-            ViewData["data"] = Calculate();
+            NumbersOperations data = GetData();
+            return View(data);
+        }
 
+        public IActionResult UsingViewData()
+        {
+            ViewData["data"] = GetData();
             return View();
         }
 
-        public IActionResult PassUsingViewBag()
+        public IActionResult UsingViewBag()
         {
-            ViewBag.data = Calculate();
-
+            ViewBag.data = GetData();
             return View();
         }
 
-        public IActionResult PassUsingService()
+        public IActionResult UsingServiceInjection()
         {
             return View();
+        }
+
+        public NumbersOperations GetData()
+        {
+            Random random = new Random(DateTime.Now.Millisecond);
+            (var firstNumber, var secondNumber) = (random.Next() % 10, random.Next() % 10);
+
+            return new NumbersOperations
+            {
+                firstNumber = firstNumber,
+                secondNumber = secondNumber,
+                sum = firstNumber + secondNumber,
+                sub = firstNumber - secondNumber,
+                mult = firstNumber * secondNumber,
+                div = checkDivisionByZero(firstNumber, secondNumber)
+            };
+        }
+
+        public int checkDivisionByZero(int firstNumber, int secondNumber)
+        {
+            try
+            {
+                var divResult = firstNumber / secondNumber;
+                return divResult;
+            }
+            catch (DivideByZeroException)
+            {
+                return -1;
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
